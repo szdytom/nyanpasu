@@ -1,0 +1,15 @@
+{
+  "name": "nyanpasu-clone",
+  "version": "0.1.0",
+  "description": "下载缓存B站上某一番剧的全部视频和弹幕",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.gzezfisher.top/szTom/nyanpasu-clone"
+  },
+  "author": "方而静 <szdytom@qq.com>",
+  "license": "GPL-2.0-only"
+}
