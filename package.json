@@ -1,15 +1,25 @@
 {
-  "name": "nyanpasu-clone",
+  "name": "nyanpasu",
+  "type": "module",
   "version": "0.1.0",
-  "description": "下载缓存B站上某一番剧的全部视频和弹幕",
-  "main": "src/index.js",
+  "description": "BiliBili 番剧视频和弹幕元数据解析脚本",
+  "main": "src/index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "./build.sh"
   },
   "repository": {
     "type": "git",
-    "url": "https://git.gzezfisher.top/szTom/nyanpasu-clone"
+    "url": "https://github.com/szdytom/nyanpasu"
   },
   "author": "方而静 <szdytom@qq.com>",
-  "license": "GPL-2.0-only"
+  "license": "GPL-2.0-only",
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.10",
+    "node-fetch": "^3.3.2",
+    "xml-formatter": "^3.6.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1"
+  }
 }
