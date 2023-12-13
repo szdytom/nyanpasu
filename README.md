@@ -72,7 +72,7 @@ Count: 25 episodes
  * Episode 23: 微妙的那条线
  * Episode 24: 未定
  * Episode 25: OVA
-Command hint: yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s" -f mp4
+Command hint: yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s"
 ```
 
 并生成四个文件：
@@ -93,7 +93,7 @@ cache.json  descriptor.xml  download-danmu.sh  vlist.txt
 yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s"
 ```
 
-根据需要，你可能需要添加 `--cookies`、`--cookies-from-browser`、`--abort-on-error` 等命令选项，注意可能无法下载付费视频和地区限制视频，可能会报错。更多信息请参考 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的文档。
+根据需要，你可能需要添加 `--cookies`、`--cookies-from-browser`、`--abort-on-error` 等命令选项，注意可能无法下载付费视频和地区限制视频，可能会报错。关于更多信息，请参考 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的文档。
 
 你可以通过 `--help` 选项或阅读 `src/index.mjs` 源代码以查看更多命令行选项。
 
