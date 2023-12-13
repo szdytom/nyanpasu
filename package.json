@@ -1,7 +1,7 @@
 {
   "name": "nyanpasu",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "BiliBili 番剧视频和弹幕元数据解析脚本",
   "main": "src/index.mjs",
   "scripts": {
