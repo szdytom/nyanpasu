@@ -189,20 +189,20 @@ async function processDescriptor(rawDesc) {
 	let tasks = [];
 	tasks.push(fs.writeFile('descriptor.xml', xmlContent));
 
-	info('Command hint: yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s" -f mp4');
-	let d_script = '#!/bin/sh\n'
+	info('Command hint: yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s"');
+	let d_script = '#!/bin/sh\nset -e\n'
 	let v_list = [], covers = new Set();
 	for (let episode of anime.episodes) {
 		const filename = `${episode.id.toString().padStart(5, '0')}.xml`;
 		const download_link = `https://comment.bilibili.com/${episode.cid}.xml`;
-		d_script += `wget -O ${filename} ${download_link}\n`;
+		d_script += `curl --compressed -Lgf --retry 3 --retry-delay 3 -o ${filename} ${download_link}\n`;
 		v_list.push(episode.link);
 		covers.add(episode.cover);
 	}
 
 	let i = 1;
 	for (let cover of covers) {
-		d_script += `wget -O cover-${i}.jpg https:${cover}\n`;
+		d_script += `curl -Lgf --retry 3 --retry-delay 3 -o cover-${i}.jpg https:${cover}\n`;
 		i += 1;
 	}
 	tasks.push(fs.writeFile('download-danmu.sh', d_script));
