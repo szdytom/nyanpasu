@@ -2,13 +2,23 @@
 
 喵帕斯解析器是一个 BiliBili 番剧视频和弹幕元数据的解析脚本，可以根据链接自动下载和解析视频和弹幕元数据，并创建下载列表。
 
+## 功能
+
+喵帕斯解析器可以根据一个链接解析相关的资源数据和链接，它被设计为自动化工具链中的一环，在需要大量解析缓存番剧数据时可能十分有用。但是，请注意，喵帕斯解析器**不是**一个：
+
+- 弹幕下载器：喵帕斯解析器可以找到下载弹幕的链接，并生成用于批量下载弹幕的脚本。但是实际的下载过程不是由喵帕斯解析器完成的（而是依赖于 [curl](https://github.com/curl/curl)），如果你仅仅希望下载某一视频的弹幕，你可能希望使用 [Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved) 这一浏览器插件。
+- 视频下载器：喵帕斯解析器可以找到视频播放的链接，并生成用于批量下载视频的链接文件。但是实际的下载过程不是由喵帕斯解析器完成的（而是依赖于 [yt-dlp](https://github.com/yt-dlp/yt-dlp)），如果你仅仅希望下载某一视频，你可能希望直接使用 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 脚本。
+- 弹幕播放器：喵帕斯解析器可以帮助你生成用于正确保存视频和弹幕的脚本，但是喵帕斯解析器不能理解视频或弹幕文件，如果你希望播放视频和弹幕，你可能希望使用 [KikoPlay](https://github.com/KikoPlayProject/KikoPlay) 或者其他类似的软件。
+- DRM破解器：喵帕斯解析器没有任何魔法帮助你查看或破解你无权查看的数据和视频，喵帕斯解析器只能下载和分析公开的数据。
+- 面向最终用户的应用程序：喵帕斯解析器不包含一个图形用户界面，它仅仅是基于命令行的，可能需要一定的计算机素养才能正确使用它。
+
 ## 安装
 
 此脚本没有使用任何平台特定的代码，应当可以适用于所有主流操作系统，但是它只在 Linux 下测试过。
 
 你需要首先安装 Node.JS 以运行此脚本。你可以从 Github Release 下载到一个压缩后脚本，包含脚本代码及其 NPM 依赖。该脚本包含正确的“井号注释”（shebang），可以直接赋予可执行权限并执行。你可以考虑将其复制到 PATH 目录下（例如 `~/.local/bin` 或者 `/usr/local/bin`）以便于使用。
 
-你可能希望安装 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 及其依赖 [ffmpeg](https://ffmpeg.org/) 以便于下载视频。你可能还希望使用 [Tmux](https://github.com/tmux/tmux) 或者 [GNU Screen](https://www.gnu.org/software/screen/) 以防止因为关闭终端而导致下载中断。
+你可能希望安装 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 及其依赖 [ffmpeg](https://ffmpeg.org/) 以便于下载视频。你可能还希望使用 [Tmux](https://github.com/tmux/tmux) 或者 [GNU Screen](https://www.gnu.org/software/screen/) 以防止因为关闭终端而导致下载中断。如果你下载了视频和弹幕文件，你可能希望安装 [KikoPlay](https://github.com/KikoPlayProject/KikoPlay) 弹幕播放器。
 
 ## 构建
 
@@ -71,7 +81,7 @@ Command hint: yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s" -f mp4
 cache.json  descriptor.xml  download-danmu.sh  vlist.txt
 ```
 
-其中 `cache.json` 是番剧元数据的缓存，`descriptor.xml` 是简化后的番剧元数据，可供人阅读或其他软件解析。`download-danmu.sh` 是用于下载弹幕数据和番剧封面图的脚本（内部使用 `wget`）。`vlist.txt` 是各集视频的链接，你可以进一步使用如下命令下载弹幕数据和番剧封面图：
+其中 `cache.json` 是番剧元数据的缓存，`descriptor.xml` 是简化后的番剧元数据，可供人阅读或其他软件解析。`download-danmu.sh` 是用于下载弹幕数据和番剧封面图的脚本（内部使用 [curl](https://github.com/curl/curl)）。`vlist.txt` 是各集视频的链接，你可以进一步使用如下命令下载弹幕数据和番剧封面图：
 
 ```sh
 ./download-danmu.sh
@@ -80,7 +90,7 @@ cache.json  descriptor.xml  download-danmu.sh  vlist.txt
 如果你安装了 [yt-dlp](https://github.com/yt-dlp/yt-dlp)，你进一步可以根据 `vlist.txt` 中的链接下载各集视频：
 
 ```
-yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s" -f mp4
+yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s"
 ```
 
 根据需要，你可能需要添加 `--cookies`、`--cookies-from-browser`、`--abort-on-error` 等命令选项，注意可能无法下载付费视频和地区限制视频，可能会报错。更多信息请参考 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的文档。
@@ -95,7 +105,7 @@ yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s" -f mp4
 
 请注意，本项目不代表上海宽娱数码科技有限公司或番剧版权方的意见，本项目按照“按其原样”的原则提供，不提供任何附带保证，使用者需承担可能的风险。
 
-本项目完全开源，且没有任何代码加密操作，如有疑虑请自行审查代码或停止使用相关文件。对于使用本项目产生的额外问题，如账户封禁或被盗等，维护者不对此负责，请谨慎使用。
+本项目完全开源，且没有任何代码加密操作，如有疑虑请自行审查代码或停止使用相关文件。此软件的行为代表其使用者的行为，而非代表其维护者的行为，如账户封禁或被盗等，维护者不对此负责，请谨慎使用。
 
 请尊重数字版权，请勿二次分发使用此脚本（以及使用此脚本生成的脚本）得到文件。
 
