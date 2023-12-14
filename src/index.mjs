@@ -119,9 +119,20 @@ class AnimeEpisode {
 		}
 		return episodeRoot;
 	}
+
+	toString() {
+		return `Episode ${this.id}: ${this.title}`;
+	}
 };
 
-function parseDescriptor(source) {
+let enableLogging = true;
+function info(msg) {
+	if (enableLogging) {
+		console.log(`${msg}`);
+	}
+}
+
+function parseDescriptor(source, includePv, minDuration) {
 	const data = source.props?.pageProps?.dehydratedState?.queries[0]?.state?.data?.seasonInfo?.mediaInfo
 	if (data == null) {
 		throw new Error('Cannot parse descriptor: media info not found');
@@ -144,9 +155,11 @@ function parseDescriptor(source) {
 		rating: data.rating,
 	});
 
+	let duration_warn = false;
+	let episode_id = 1;
 	for (let i = 0; i < data.episodes.length; ++i) {
 		let edata = data.episodes[i];
-		let episode = new AnimeEpisode(i + 1, edata.long_title, {
+		let episode = new AnimeEpisode(episode_id, edata.long_title, {
 			aid: edata.aid,
 			bvid: edata.bvid,
 			cid: edata.cid,
@@ -158,25 +171,33 @@ function parseDescriptor(source) {
 			displayTitle: edata.playerEpTitle,
 			skip: edata.skip,
 		});
-		anime.episodes.push(episode);
+
+		if (!includePv && edata.badge != null && edata.badge.search('预告') != -1) {
+			info(`Filtered pv (specify --include-pv to keep): ${episode.toString()}`);
+		} else if (edata.duration < minDuration * 1000) {
+			info(`Filtered duration: ${episode.toString()}`);
+		} else if (edata.duration < 180000 && minDuration === 0) { // 3 minute
+			duration_warn = true;
+		} else {
+			episode_id += 1;
+			anime.episodes.push(episode);
+		}
+	}
+
+	if (duration_warn) {
+		info('Some of the videos are shorter than 3 minutes, you may want to specify --min-duration to filter them out');
 	}
 
 	return anime;
 }
 
-let enableLogging = true;
-function info(msg) {
-	if (enableLogging) {
-		console.log(`${msg}`);
-	}
-}
-
-async function processDescriptor(rawDesc) {
-	let anime = parseDescriptor(rawDesc);
+async function processDescriptor(rawDesc, includePv, minDuration) {
+	let anime = parseDescriptor(rawDesc, includePv, minDuration);
 	info(`Title: ${anime.title}`);
 	info(`Count: ${anime.episodes.length} episodes`);
+
 	for (let episode of anime.episodes) {
-		info(` * Episode ${episode.id}: ${episode.title}`);
+		info(` * ${episode.toString()}`);
 	}
 
 	let doc = (new xmldom.DOMImplementation()).createDocument(DESC_XMLNS, 'xml');
@@ -226,7 +247,19 @@ async function main() {
 			type: 'boolean',
 			default: false,
 			alias: 'q',
-		}).usage('Uasge: <url>').help().alias('help', 'h').argv;
+		}).option('include-pv', {
+			description: 'Include pv in the playlist',
+			type: 'boolean',
+			default: false,
+		}).option('min-duration', {
+			description: 'Filter episodes with duration too small (unit: second)',
+			type: 'number',
+			default: 0,
+		}).option('suppress-tmux-warning', {
+			description: 'Suppress warning of not inside a TMUX session',
+			type: 'boolean',
+			default: false,
+		}).usage('Uasge: <url>').version('0.1.2').help().alias('help', 'h').argv;
 	const url = args._[0];
 	enableLogging = !args.quiet;
 	if (args.skipUrl && args.noCache) {
@@ -257,9 +290,10 @@ async function main() {
 			await fs.writeFile('cache.json', JSON.stringify(rawDesc));
 		}
 	}
-	await processDescriptor(rawDesc);
 
-	if (process.env.TMUX == null && process.env.STY == null) {
+	await processDescriptor(rawDesc, args.includePv, args.minDuration);
+
+	if (!args.suppressTmuxWarning && process.env.TMUX == null && process.env.STY == null) {
 		info('It seems that you are NOT inside a tmux or screen session!!');
 	}
 }
