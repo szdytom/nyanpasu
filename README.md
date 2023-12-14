@@ -16,9 +16,17 @@
 
 此脚本没有使用任何平台特定的代码，应当可以适用于所有主流操作系统，但是它只在 Linux 下测试过。
 
-你需要首先安装 Node.JS 以运行此脚本。你可以从 Github Release 下载到一个压缩后脚本，包含脚本代码及其 NPM 依赖。该脚本包含正确的“井号注释”（shebang），可以直接赋予可执行权限并执行。你可以考虑将其复制到 PATH 目录下（例如 `~/.local/bin` 或者 `/usr/local/bin`）以便于使用。
+你需要首先安装 Node.JS 以运行此脚本。你可以从 Release 页面下载到一个压缩后脚本（`nyanpasu.mjs`），该文件已经将 NPM 依赖内嵌在文件中，因此不依赖第三方库。该脚本包含正确的“井号注释”（shebang），可以直接赋予可执行权限并执行。你可以考虑将其复制到 PATH 目录下（例如 `~/.local/bin` 或者 `/usr/local/bin`）以便于使用。
 
 你可能希望安装 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 及其依赖 [ffmpeg](https://ffmpeg.org/) 以便于下载视频。你可能还希望使用 [Tmux](https://github.com/tmux/tmux) 或者 [GNU Screen](https://www.gnu.org/software/screen/) 以防止因为关闭终端而导致下载中断。如果你下载了视频和弹幕文件，你可能希望安装 [KikoPlay](https://github.com/KikoPlayProject/KikoPlay) 弹幕播放器。
+
+### AUR 安装
+
+如果你使用 Arch Linux，你可以使用 [AUR](https://aur.archlinux.org/packages/nyanpasu-bin) 来安装此脚本，首先你需要安装一个 AUR 助手（假定为 [Yay](https://github.com/Jguer/yay)），然后运行命令：
+
+```sh
+yay -S nyanpasu-bin
+```
 
 ## 构建
 
