@@ -234,7 +234,7 @@ async function processDescriptor(rawDesc, includePv, minDuration) {
 
 async function main() {
 	const args = yargs(hideBin(process.argv))
-		.option('no-cache', {
+		.option('skip-cache', {
 			description: 'Ignore local cache.json',
 			type: 'boolean',
 			default: false,
@@ -259,10 +259,10 @@ async function main() {
 			description: 'Suppress warning of not inside a TMUX session',
 			type: 'boolean',
 			default: false,
-		}).usage('Uasge: <url>').version('0.1.2').help().alias('help', 'h').argv;
+		}).usage('Uasge: <url>').version('0.1.3').help().alias('help', 'h').argv;
 	const url = args._[0];
 	enableLogging = !args.quiet;
-	if (args.skipUrl && args.noCache) {
+	if (args.skipUrl && args.skipCache) {
 		console.error('There is nothing to do.');
 		process.exit(1);
 	}
@@ -272,7 +272,7 @@ async function main() {
 	}
 
 	let rawDesc;
-	if (args.noCache) {
+	if (args.skipCache) {
 		info('Downloading descriptor info (no cache)');
 		rawDesc = await fetchDescriptor(url);
 	} else {
