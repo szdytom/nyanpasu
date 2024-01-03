@@ -1,12 +1,12 @@
 # 喵帕斯解析器 (nyanpasu)
 
-喵帕斯解析器是一个 BiliBili 番剧视频和弹幕元数据的解析脚本，可以根据链接自动下载和解析视频和弹幕元数据，并创建下载列表。
+喵帕斯解析器是一个 BiliBili 番剧视频和弹幕元数据的解析脚本，可用于快速缓存 BiliBili 番剧各集的数据。喵帕斯解析器可以根据链接自动下载和解析视频和弹幕元数据，并创建下载列表。
 
 ## 功能
 
 喵帕斯解析器可以根据一个链接解析相关的资源数据和链接，它被设计为自动化工具链中的一环，在需要大量解析缓存番剧数据时可能十分有用。但是，请注意，喵帕斯解析器**不是**一个：
 
-- 弹幕下载器：喵帕斯解析器可以找到下载弹幕的链接，并生成用于批量下载弹幕的脚本。但是实际的下载过程不是由喵帕斯解析器完成的（而是依赖于 [curl](https://github.com/curl/curl)），如果你仅仅希望下载某一视频的弹幕，你可能希望使用 [Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved) 这一浏览器插件。
+- 弹幕下载器：喵帕斯解析器可以找到下载弹幕的链接，并生成用于批量下载弹幕的脚本。但是实际的下载过程不是由喵帕斯解析器完成的（而是依赖于 [curl](https://github.com/curl/curl) 或其他命令行下载器），如果你仅仅希望下载某一视频的弹幕，你可能希望使用 [Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved) 这一浏览器插件。
 - 视频下载器：喵帕斯解析器可以找到视频播放的链接，并生成用于批量下载视频的链接文件。但是实际的下载过程不是由喵帕斯解析器完成的（而是依赖于 [yt-dlp](https://github.com/yt-dlp/yt-dlp)），如果你仅仅希望下载某一视频，你可能希望直接使用 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 脚本。
 - 弹幕播放器：喵帕斯解析器可以帮助你生成用于正确保存视频和弹幕的脚本，但是喵帕斯解析器不能理解视频或弹幕文件，如果你希望播放视频和弹幕，你可能希望使用 [KikoPlay](https://github.com/KikoPlayProject/KikoPlay) 或者其他类似的软件。
 - DRM破解器：喵帕斯解析器没有任何魔法帮助你查看或破解你无权查看的数据和视频，喵帕斯解析器只能下载和分析公开的数据。
@@ -16,7 +16,11 @@
 
 此脚本没有使用任何平台特定的代码，应当可以适用于所有主流操作系统，但是它只在 Linux 下测试过。
 
-你需要首先安装 Node.JS 以运行此脚本。你可以从 Release 页面下载到一个压缩后脚本（`nyanpasu.mjs`），该文件已经将 NPM 依赖内嵌在文件中，因此不依赖第三方库。该脚本包含正确的“井号注释”（shebang），可以直接赋予可执行权限并执行。你可以考虑将其复制到 PATH 目录下（例如 `~/.local/bin` 或者 `/usr/local/bin`）以便于使用。
+你需要首先安装 Node.JS 以运行此脚本。你可以从 Release 页面下载到一个压缩后脚本（`nyanpasu.mjs`），该文件已经将 NPM 依赖内嵌在文件中，因此不依赖第三方库。
+
+对于 Linux 操作系统，该脚本包含正确的“井号注释”（shebang），可以直接赋予可执行权限以便执行。你可以考虑将其复制到 PATH 目录下（例如 `~/.local/bin` 或者 `/usr/local/bin`）以便于使用。
+
+对于 Windows 操作系统，你可能需要将 `.mjs` 设置为默认使用 Node.JS 运行，或者每次运行时使用 `node --experimental-modules nyanpasu.mjs`。（由于本人对 Windows 的使用经验不足，这里的描述可能与实际情况有偏差，如果你有更好的打包方式，请随时打开一个 Issue 或 PR 讨论。）
 
 你可能希望安装 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 及其依赖 [ffmpeg](https://ffmpeg.org/) 以便于下载视频。你可能还希望使用 [Tmux](https://github.com/tmux/tmux) 或者 [GNU Screen](https://www.gnu.org/software/screen/) 以防止因为关闭终端而导致下载中断。如果你下载了视频和弹幕文件，你可能希望安装 [KikoPlay](https://github.com/KikoPlayProject/KikoPlay) 弹幕播放器。
 
@@ -39,7 +43,7 @@ npm run build
 
 即可在 `dist/nyanpasu.mjs` 找到输出。
 
-请注意，此脚本的打包脚本 `build.sh` 不适用于 Windows（依赖于 `/bin/sh`），但是可以应当很容易的适配到 Windows（如果对此需要帮助，请随时提交一个 Issue）。
+此脚本的打包脚本通过 `build.cjs` 根据操作系统自动选择使用 `build.sh` 还是 `build.bat`，值得注意的是，适用于 Windows 的构建脚本没有经过充分测试，如果你遇到问题，请随时打开一个 Issue。
 
 ## 使用方法
 
@@ -89,7 +93,7 @@ Command hint: yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s"
 cache.json  descriptor.xml  download-danmu.sh  vlist.txt
 ```
 
-其中 `cache.json` 是番剧元数据的缓存，`descriptor.xml` 是简化后的番剧元数据，可供人阅读或其他软件解析。`download-danmu.sh` 是用于下载弹幕数据和番剧封面图的脚本（内部使用 [curl](https://github.com/curl/curl)）。`vlist.txt` 是各集视频的链接，你可以进一步使用如下命令下载弹幕数据和番剧封面图：
+其中 `cache.json` 是番剧元数据的缓存，`descriptor.xml` 是简化后的番剧元数据，可供人阅读或其他软件解析。`download-danmu.sh` 是用于下载弹幕数据和番剧封面图的脚本（内部使用 [curl](https://github.com/curl/curl)，如果你使用的是 Windows，你应该会得到内部使用 `Invoke-WebRequest` 的 PowerShell 脚本）。`vlist.txt` 是各集视频的链接，你可以进一步使用如下命令下载弹幕数据和番剧封面图：
 
 ```sh
 ./download-danmu.sh
@@ -103,11 +107,33 @@ yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s"
 
 根据需要，你可能需要添加 `--cookies`、`--cookies-from-browser`、`--abort-on-error` 等命令选项，注意可能无法下载付费视频和地区限制视频，可能会报错。关于更多信息，请参考 [yt-dlp](https://github.com/yt-dlp/yt-dlp) 的文档。
 
-你可以通过 `--help` 选项或阅读 `src/index.mjs` 源代码以查看更多命令行选项。
+### 关于缓存
+
+在执行脚本后，会在当前目录下生成 `cache.json`，内部包含 BiliBili 关于番剧的元数据缓存。在第二次执行脚本时，如果检测到 `cache.json` 存在，则不再会重新请求，而是直接使用 `cache.json` 内部缓存的数据，**即使两次执行使用的 URL 参数不相同**。
+
+`cache.json` 内部的格式可能并不稳定，请尽可能地使用 `descriptor.xml` 中的数据而不是 `cache.json`。
+
+### 命令行选项
+
+你也可以通过 `--help` 选项或阅读 `src/index.mjs` 源代码以查看喵帕斯解析器的命令行选项。
+
+- `--skip-cache`：不读取/写入本地缓存 `cache.json`。
+- `--skip-url`：不使用 URL 参数，而是读取本地缓存 `cache.json`。
+- `--include-pv`：不将标记为“预告”的视频排除在外。
+- `--min-duration <seconds>`：将时长小于给定值的视频排除在外，可用于筛选掉PV和MV。
+- `--danmu-source`：选择使用 `comment.bilibili.com` 还是 `api.bilibili.com` 的弹幕链接，理论上没有区别。
+- `--downloader-command`：选择脚本内使用 [curl](https://github.com/curl/curl) 还是 [Invoke-WebRequest](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/invoke-webrequest) 作为命令行下载器。
+- `--script-format`：选择脚本的格式（可选 `bash`、`cmd` 或 `powershell`，亦可指定 `none` 以抑制解析器生成弹幕下载脚本）。
+- `--downloader-args`：为命令行下载器指定额外的参数，注意该选项的值需要以引号包裹，并以空格开头，例如 `--downloader-args " -A -B --example"`。
+- `--downloader-args-override`：覆盖命令行下载器的参数，注意该选项的值需要以引号包裹，并以空格开头，例如 `--downloader-args-override " -A -B --example"`。
 
 ## 社区
 
 我们期待来自社区的贡献。如果您遇到了错误，请随时提出问题。还有许多可以添加的功能。如果您实现了任何增强功能，欢迎打开一个拉取请求。
+
+## 名称
+
+喵帕斯这个词出自 [悠哉日常大王](https://zh.moegirl.org.cn/%E6%82%A0%E5%93%89%E6%97%A5%E5%B8%B8%E5%A4%A7%E7%8E%8B)，请参见[百科条目](https://zh.moegirl.org.cn/%E5%96%B5%E5%B8%95%E6%96%AF)。
 
 ## 声明
 
