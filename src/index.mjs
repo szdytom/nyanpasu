@@ -7,10 +7,13 @@ import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs';
 
 const DESC_XMLNS = "nyanpasu:descriptor";
+const CLASSIC_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36";
 
-async function fetchDescriptor(url) {
+async function fetchDescriptor(url, ua) {
 	try {
-		const response = await fetch(url);
+		const response = await fetch(url, {
+			headers: { 'User-Agent': ua ?? CLASSIC_UA },
+		});
 		const html = await response.text();
 		const regex = /<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s;
 		const match = html.match(regex);
@@ -134,7 +137,7 @@ class DownloadTarget {
 };
 
 class DownloadCommand {
-	constructor(defaultArgs, supportFlags, { customArgs, overrideArgs }) {
+	constructor(defaultArgs, supportFlags, { customArgs, overrideArgs, ua }) {
 		if (overrideArgs != null) {
 			this.args = overrideArgs;
 		} else {
@@ -143,6 +146,7 @@ class DownloadCommand {
 		if (this.args.length && this.args[0] != ' ') {
 			this.args = ' ' + this.args;
 		}
+		this.ua = ua ?? CLASSIC_UA;
 
 		this.supportFlags = supportFlags;
 	}
@@ -158,10 +162,8 @@ class CurlDownloadCommand extends DownloadCommand {
 	}
 
 	downloadFile(target, filename) {
-		if (target.compressed) {
-			return `curl${this.args} --compressed -o "${filename}" "${target.uri}"`;
-		}
-		return `curl${this.args} -o "${filename}" "${target.uri}"`;
+		let cflag = target.compressed ? '--compressed' : '';
+		return `curl${this.args} -A "${this.ua}" ${cflag} -o "${filename}" "${target.uri}"`;
 	}
 };
 
@@ -171,7 +173,7 @@ class PowerShellDownloadCommand extends DownloadCommand {
 	}
 
 	downloadFile(target, filename) {
-		return `Invoke-WebRequest${this.args} -Uri "${target.uri}" -OutFile "${filename}"`;
+		return `iwr${this.args} -User-Agent "${this.ua}" -Uri "${target.uri}" -OutFile "${filename}"`;
 	}
 };
 
@@ -482,6 +484,11 @@ async function main() {
 			description: 'Suppress warning of not inside a TMUX session',
 			type: 'boolean',
 			default: false,
+		}).option('user-agent', {
+			description: 'HTTP header User-Agent value',
+			alias: 'A',
+			type: 'string',
+			default: CLASSIC_UA,
 		}).usage('Uasge: <url>').version('0.1.4').help().alias('help', 'h').argv;
 
 	const url = args._[0];
@@ -522,6 +529,7 @@ async function main() {
 	let downloader = new downloaderMap[downloaderType]({
 		customArgs: args.downloaderArgs,
 		overrideArgs: args.downloaderArgsOverride,
+		ua: args.userAgent,
 	});
 
 	const scriptBuilderMap = {
@@ -547,7 +555,7 @@ async function main() {
 				process.exit(1);
 			}
 			info('Downloading descriptor info');
-			rawDesc = await fetchDescriptor(url);
+			rawDesc = await fetchDescriptor(url, args.userAgent);
 			await fs.writeFile('cache.json', JSON.stringify(rawDesc));
 		}
 	}
