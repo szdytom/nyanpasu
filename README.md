@@ -126,7 +126,7 @@ yt-dlp -a vlist.txt -o "%(autonumber)s.%(ext)s"
 - `--script-format`：选择脚本的格式（可选 `bash`、`cmd` 或 `powershell`，亦可指定 `none` 以抑制解析器生成弹幕下载脚本）。
 - `--downloader-args`：为命令行下载器指定额外的参数，注意该选项的值需要以引号包裹，并以空格开头，例如 `--downloader-args " -A -B --example"`。
 - `--downloader-args-override`：覆盖命令行下载器的参数，注意该选项的值需要以引号包裹，并以空格开头，例如 `--downloader-args-override " -A -B --example"`。
-- `--user-agent`：指定 HTTP 请求头中的 `User-Agennt` 项的值。
+- `--user-agent`：指定 HTTP 请求头中的 `User-Agent` 项的值。
 
 ## 社区
 
